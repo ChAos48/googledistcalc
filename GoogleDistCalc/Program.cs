@@ -29,29 +29,31 @@ namespace GoogleDistCalc {
                 File.Delete("Output.csv");
             }
             using (StreamWriter output = new StreamWriter("Output.csv")) {
-                for (int i = 0; i < ClientsRows.Length; i++) {
-                    for (int j = 0; j < ClientsCol.Length; j++) {
-                        if (ClientsRows[i] != null && ClientsCol != null) {
-                            Origin = ClientsRows[i].Replace(' ', '+');
-                            Destination = ClientsCol[j].Replace(' ', '+');
+                
+                string[] temp = new string[ClientsCol.Length];
+                for (int Row = 0; Row < ClientsRows.Length; Row++) {
+                    for (int Col = 0; Col < ClientsCol.Length; Col++) {
+                        if (ClientsRows[Row] != null && ClientsCol != null) {
 
-                            Console.Write("" + ClientsRows[i] + ",");
-                            Console.Write("" + ClientsCol[j] + ",");
-                            Console.Write(getDistance(Origin, Destination).ToString());
+                            temp = new string[ClientsRows.Length];
 
-                            Console.Write(Environment.NewLine);
+                            Origin = ClientsRows[Col].Replace(' ', '+');
+                            Destination = ClientsCol[Row].Replace(' ', '+');
 
-                            output.Write("" + ClientsRows[i] + ",");
-                            output.Write("" + ClientsCol[j] + ",");
-                            output.Write(getDistance(Origin, Destination).ToString());
+                            temp[Row] = (getDistance(Origin, Destination)/1000).ToString();
 
-                            output.Write(Environment.NewLine);
+                            Console.Write(String.Join(",", temp));
+                            output.Write(String.Join(",", temp));
 
                             Origin = "";
                             Destination = "";
 
                         }
+                        Console.Write(Environment.NewLine);
+                        output.Write(Environment.NewLine);
                     }
+                    Console.Write(Environment.NewLine);
+                    output.Write(Environment.NewLine);
                 }
             }
 
@@ -61,12 +63,15 @@ namespace GoogleDistCalc {
 
         }
 
-        public static string getDistance(string origin, string destination) {
-            System.Threading.Thread.Sleep(10);
+        public static int getDistance(string origin, string destination) {
+            //Console.WriteLine("DEBUG: origin= " + origin);
+            //Console.WriteLine("DEBUG: Destination= " + destination);
+
+            System.Threading.Thread.Sleep(1);
             string distance = "";
             string url = "https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric" + "&origins=" + origin + "&destinations=" + destination + "&key=AIzaSyB4hwDqmpQ-p6eTsUXRYmC4-oc_CQjRH6Q";
             //url = https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric&origins=<origin>&destinations=<Destination>&key=YOUR_API_KEY
-            //Console.WriteLine("URL: " + url);
+            //Console.WriteLine("DEBUG: URL= " + url);
             string requesturl = url;
             string content = fileGetContents(requesturl);
 
@@ -74,11 +79,11 @@ namespace GoogleDistCalc {
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.LoadXml(content);
                 XmlNodeList Nodes = xdoc.GetElementsByTagName("distance");
-                distance = Nodes[0].ChildNodes[1].InnerText.ToString();
-                return distance;
+                distance = Nodes[0].ChildNodes[0].InnerText.ToString();
+                return int.Parse(distance);
             }
             else {
-                return "Error getting distance";
+                return 0;
             }
 
         }
