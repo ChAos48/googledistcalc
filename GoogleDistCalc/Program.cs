@@ -22,38 +22,51 @@ namespace GoogleDistCalc {
             string[] ClientsCol = File.ReadAllLines("input.txt");
             string Origin = "";
             string Destination = "";
+            string[,] OutputArr = new string[ClientsRows.Length, ClientsCol.Length];
 
             Console.WriteLine("Proccessing");
+
+            //populate array
+            for (int Row = 0; Row < ClientsRows.Length; Row++) {
+                for (int Col = 0; Col < ClientsCol.Length; Col++) {
+
+                    if (ClientsRows[Row] != null && ClientsCol != null) {
+
+                        Origin = ClientsRows[Col].Replace(' ', '+');
+                        Destination = ClientsCol[Row].Replace(' ', '+');
+                        int distance = getDistance(Origin, Destination);
+
+                        OutputArr[Row, Col] = (distance / 1000).ToString();
+
+                        Origin = "";
+                        Destination = "";
+
+                    }
+                }
+            }
 
             if (File.Exists("Output.csv")) {
                 File.Delete("Output.csv");
             }
+
+            //output to file
             using (StreamWriter output = new StreamWriter("Output.csv")) {
-                
-                string[] temp = new string[ClientsCol.Length];
+
                 for (int Row = 0; Row < ClientsRows.Length; Row++) {
                     for (int Col = 0; Col < ClientsCol.Length; Col++) {
-                        if (ClientsRows[Row] != null && ClientsCol != null) {
 
-                            temp = new string[ClientsRows.Length];
+                        if (Col <= OutputArr.GetLength(1)) {
 
-                            Origin = ClientsRows[Col].Replace(' ', '+');
-                            Destination = ClientsCol[Row].Replace(' ', '+');
+                            Console.Write(String.Format("{0}", OutputArr[Row, Col]));
+                            Console.Write(",");
 
-                            temp[Row] = (getDistance(Origin, Destination)/1000).ToString();
-
-                            Console.Write(String.Join(",", temp));
-                            output.Write(String.Join(",", temp));
-
-                            Origin = "";
-                            Destination = "";
+                            output.Write(String.Format("{0}", OutputArr[Row, Col]));
+                            output.Write(",");
 
                         }
-                        Console.Write(Environment.NewLine);
-                        output.Write(Environment.NewLine);
                     }
-                    Console.Write(Environment.NewLine);
-                    output.Write(Environment.NewLine);
+                    output.WriteLine();
+                    Console.WriteLine();
                 }
             }
 
@@ -64,14 +77,10 @@ namespace GoogleDistCalc {
         }
 
         public static int getDistance(string origin, string destination) {
-            //Console.WriteLine("DEBUG: origin= " + origin);
-            //Console.WriteLine("DEBUG: Destination= " + destination);
-
             System.Threading.Thread.Sleep(1);
             string distance = "";
             string url = "https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric" + "&origins=" + origin + "&destinations=" + destination + "&key=AIzaSyB4hwDqmpQ-p6eTsUXRYmC4-oc_CQjRH6Q";
             //url = https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric&origins=<origin>&destinations=<Destination>&key=YOUR_API_KEY
-            //Console.WriteLine("DEBUG: URL= " + url);
             string requesturl = url;
             string content = fileGetContents(requesturl);
 
