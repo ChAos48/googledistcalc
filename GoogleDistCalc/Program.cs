@@ -5,86 +5,99 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.IO;
+using System.Xml;
+using System.Net;
 
-namespace GoogleDistCalc
-{
-    class Program
-    {
+namespace GoogleDistCalc {
+    class Program {
         /// <summary>
         /// args[0] is input filename
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args) {
-            string[,] workingArray = new string[200, 2];
-            string inputfilename = args[0];
-            string[] Clients = File.ReadAllLines(inputfilename);
+
+            Console.WriteLine("Reading Input.txt");
+
+            string[] ClientsRows = File.ReadAllLines("input.txt");
+            string[] ClientsCol = File.ReadAllLines("input.txt");
             string Origin = "";
             string Destination = "";
-            string[,] OutputArray = new string[200, 3];
 
-            for (int i = 0; i < 200; i++) {
-                workingArray[i, 0] = Clients[i];
-                workingArray[i, 1] = Clients[i];
+            Console.WriteLine("Proccessing");
+
+            if (File.Exists("Output.csv")) {
+                File.Delete("Output.csv");
             }
-            
-            for (int j = 0; j < 200; j++) {
-
-                Origin = workingArray[j, 0].Replace(' ', '+');
-                Destination = workingArray[j, 1].Replace(' ', '+');
-
-                
-                OutputArray[j,0] = Origin;
-                OutputArray[j,1] = Destination;
-                OutputArray[j, 3] = getDistance(Origin, Destination).ToString();
-
-            }
-
             using (StreamWriter output = new StreamWriter("Output.csv")) {
-                for(int i = 0; i < 200; i++) {
-                    output.Write(OutputArray[i, 0]+",");
-                    output.Write(OutputArray[i, 1] + ",");
-                    output.Write(OutputArray[i, 2] + Environment.NewLine);
+                for (int i = 0; i < ClientsRows.Length; i++) {
+                    for (int j = 0; j < ClientsCol.Length; j++) {
+                        if (ClientsRows[i] != null && ClientsCol != null) {
+                            Origin = ClientsRows[i].Replace(' ', '+');
+                            Destination = ClientsCol[j].Replace(' ', '+');
+
+                            Console.Write("" + ClientsRows[i] + ",");
+                            Console.Write("" + ClientsCol[j] + ",");
+                            Console.Write(getDistance(Origin, Destination).ToString());
+
+                            Console.Write(Environment.NewLine);
+
+                            output.Write("" + ClientsRows[i] + ",");
+                            output.Write("" + ClientsCol[j] + ",");
+                            output.Write(getDistance(Origin, Destination).ToString());
+
+                            output.Write(Environment.NewLine);
+
+                            Origin = "";
+                            Destination = "";
+
+                        }
+                    }
                 }
             }
-            
+
+            Console.WriteLine("Done. please open output.csv");
+            Console.WriteLine("Press Enter to Quit");
+            Console.Read();
+
         }
 
-        public static int getDistance(string origin, string destination) {
-            System.Threading.Thread.Sleep(1000);
-            int distance = 0;
-            //string from = origin.Text;
-            //string to = destination.Text;
-            string url = "http://maps.googleapis.com/maps/api/directions/json?origin=" + origin + "&destination=" + destination + "&units=" + "&key=AIzaSyB4hwDqmpQ-p6eTsUXRYmC4-oc_CQjRH6Q";
+        public static string getDistance(string origin, string destination) {
+            System.Threading.Thread.Sleep(10);
+            string distance = "";
+            string url = "https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric" + "&origins=" + origin + "&destinations=" + destination + "&key=AIzaSyB4hwDqmpQ-p6eTsUXRYmC4-oc_CQjRH6Q";
+            //url = https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric&origins=<origin>&destinations=<Destination>&key=YOUR_API_KEY
+            //Console.WriteLine("URL: " + url);
             string requesturl = url;
-            //string requesturl = @"http://maps.googleapis.com/maps/api/directions/json?origin=" + from + "&alternatives=false&units=imperial&destination=" + to + "&sensor=false";
             string content = fileGetContents(requesturl);
-            JObject o = JObject.Parse(content);
-            try {
-                distance = (int)o.SelectToken("routes[0].legs[0].distance.value");
-                return distance;
-            } catch {
+
+            if (content != "Error") {
+                XmlDocument xdoc = new XmlDocument();
+                xdoc.LoadXml(content);
+                XmlNodeList Nodes = xdoc.GetElementsByTagName("distance");
+                distance = Nodes[0].ChildNodes[1].InnerText.ToString();
                 return distance;
             }
-            return distance;
-            //ResultingDistance.Text = distance;
+            else {
+                return "Error getting distance";
+            }
+
         }
 
         protected static string fileGetContents(string fileName) {
-            string sContents = string.Empty;
-            string me = string.Empty;
             try {
-                if (fileName.ToLower().IndexOf("http:") > -1) {
-                    System.Net.WebClient wc = new System.Net.WebClient();
-                    byte[] response = wc.DownloadData(fileName);
-                    sContents = System.Text.Encoding.ASCII.GetString(response);
-
-                } else {
-                    System.IO.StreamReader sr = new System.IO.StreamReader(fileName);
-                    sContents = sr.ReadToEnd();
-                    sr.Close();
+                var webRequest = WebRequest.Create(fileName);
+                using (var response = webRequest.GetResponse())
+                using (var content = response.GetResponseStream())
+                using (var reader = new StreamReader(content)) {
+                    var strContent = reader.ReadToEnd();
+                    return strContent;
                 }
-            } catch { sContents = "unable to connect to server "; }
-            return sContents;
+            }
+            catch {
+                Console.WriteLine("Something went wrong");
+                return "Error";
+
+            }
         }
     }
 }
