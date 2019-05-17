@@ -32,11 +32,13 @@ namespace GoogleDistCalc {
 
                     if (ClientsRows[Row] != null && ClientsCol != null) {
 
-                        Origin = ClientsRows[Col].Replace(' ', '+');
-                        Destination = ClientsCol[Row].Replace(' ', '+');
+                        Origin = ClientsRows[Col].Trim().Replace(' ', '+');
+                        Destination = ClientsCol[Row].Trim().Replace(' ', '+');
                         int distance = getDistance(Origin, Destination);
-
-                        OutputArr[Row, Col] = (distance / 1000).ToString();
+                        if (distance > 0) {
+                            OutputArr[Row, Col] = (distance / 1000).ToString();
+                        }
+                        else { distance = 0; }
 
                         Origin = "";
                         Destination = "";
@@ -79,6 +81,7 @@ namespace GoogleDistCalc {
         public static int getDistance(string origin, string destination) {
             System.Threading.Thread.Sleep(1);
             string distance = "";
+            string status = "";
             string url = "https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric" + "&origins=" + origin + "&destinations=" + destination + "&key=AIzaSyB4hwDqmpQ-p6eTsUXRYmC4-oc_CQjRH6Q";
             //url = https://maps.googleapis.com/maps/api/distancematrix/xml?units=metric&origins=<origin>&destinations=<Destination>&key=YOUR_API_KEY
             string requesturl = url;
@@ -87,9 +90,18 @@ namespace GoogleDistCalc {
             if (content != "Error") {
                 XmlDocument xdoc = new XmlDocument();
                 xdoc.LoadXml(content);
-                XmlNodeList Nodes = xdoc.GetElementsByTagName("distance");
-                distance = Nodes[0].ChildNodes[0].InnerText.ToString();
-                return int.Parse(distance);
+                XmlNodeList Nodes = xdoc.GetElementsByTagName("element");
+
+                status = Nodes[0].ChildNodes[0].InnerText.ToString();
+                if (status == "OK") {
+                    Console.WriteLine("DEBUG: Status OK");
+                    distance = Nodes[0].ChildNodes[2].ChildNodes[0].InnerText.ToString();
+                    return int.Parse(distance);
+                }
+                else {
+                    Console.WriteLine("DEBUG: Status Not OK");
+                    return -1;
+                }
             }
             else {
                 return 0;
@@ -108,9 +120,7 @@ namespace GoogleDistCalc {
                 }
             }
             catch {
-                Console.WriteLine("Something went wrong");
-                return "Error";
-
+                return "error";
             }
         }
     }
