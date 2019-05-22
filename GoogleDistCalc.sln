@@ -5,7 +5,13 @@ VisualStudioVersion = 15.0.27004.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GoogleDistCalc", "GoogleDistCalc\GoogleDistCalc.csproj", "{DFEEBEEA-2361-405B-9219-4C63B64CE170}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Hounds", "..\Hounding\Hounds\Hounds.shproj", "{9086A788-4947-453E-8C40-0766D199BF17}"
+EndProject
 Global
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		..\Hounding\Hounds\Hounds.projitems*{9086a788-4947-453e-8c40-0766d199bf17}*SharedItemsImports = 13
+		..\Hounding\Hounds\Hounds.projitems*{dfeebeea-2361-405b-9219-4c63b64ce170}*SharedItemsImports = 4
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

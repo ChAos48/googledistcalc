@@ -1,0 +1,7 @@
+How to Use:
+1. populate input.txt with all your destinations(one per line)
+2. Run GoogleDistCalc.exe
+3. Wait for the program to finish running.
+4. Open output.csv and do what ever you want with the data
+
+your resulting table then is ordered from the first line in input to the last line, on both axis'
