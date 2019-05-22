@@ -33,10 +33,10 @@ namespace GoogleDistCalc
                     XDocument xdoc = XDocument.Load("Settings.cfg");
 
                     foreach (XElement element in xdoc.Descendants("settings")) {
-                        
+
                         APIKey = Encryption.Decrypt(element.Value.ToString());
                     }
-                    
+
                 }
             }
 
@@ -81,9 +81,26 @@ namespace GoogleDistCalc
             //output to file
             using (StreamWriter output = new StreamWriter("Output.csv")) {
 
-                for (int Row = 0; Row < ClientsRows.Length; Row++) {
-                    for (int Col = 0; Col < ClientsCol.Length; Col++) {
+                //Horizontal Headings
+                Console.Write(",");
+                output.Write(",");
+                for (int Col = 0; Col < ClientsCol.Length; Col++) {
 
+                    Console.Write(ClientsCol[Col] + ",");
+                    output.Write(ClientsCol[Col] + ",");
+                    
+                }
+                Console.WriteLine();
+                output.WriteLine();
+                //Matrix it,self
+                for (int Row = 0; Row < ClientsRows.Length; Row++) {
+
+                    //Vertical Headings
+                    Console.Write(ClientsRows[Row]+",");
+                    output.Write(ClientsRows[Row] + ",");
+
+                    for (int Col = 0; Col < ClientsCol.Length; Col++) {
+                        
                         if (Col <= OutputArr.GetLength(1)) {
 
                             Console.Write(String.Format("{0}", OutputArr[Row, Col]));
