@@ -62,9 +62,10 @@ namespace GoogleDistCalc
 
                         Origin = ClientsRows[Col].Trim().Replace(' ', '+');
                         Destination = ClientsCol[Row].Trim().Replace(' ', '+');
-                        int distance = getDistance(Origin, Destination, APIKey);
+                        double distance = getDistance(Origin, Destination, APIKey);
+                        distance = Math.Round(distance, 1);
                         if (distance > 0) {
-                            OutputArr[Row, Col] = (distance / 1000).ToString();
+                            OutputArr[Row, Col] = (distance / 1000).ToString("0.0");
                         } else { distance = 0; }
 
                         Origin = "";
@@ -85,22 +86,21 @@ namespace GoogleDistCalc
                 Console.Write(",");
                 output.Write(",");
                 for (int Col = 0; Col < ClientsCol.Length; Col++) {
-
                     Console.Write(ClientsCol[Col] + ",");
                     output.Write(ClientsCol[Col] + ",");
-                    
                 }
                 Console.WriteLine();
                 output.WriteLine();
+
                 //Matrix it,self
                 for (int Row = 0; Row < ClientsRows.Length; Row++) {
 
                     //Vertical Headings
-                    Console.Write(ClientsRows[Row]+",");
+                    Console.Write(ClientsRows[Row] + ",");
                     output.Write(ClientsRows[Row] + ",");
 
                     for (int Col = 0; Col < ClientsCol.Length; Col++) {
-                        
+
                         if (Col <= OutputArr.GetLength(1)) {
 
                             Console.Write(String.Format("{0}", OutputArr[Row, Col]));
@@ -122,7 +122,7 @@ namespace GoogleDistCalc
 
         }
 
-        public static int getDistance(string origin, string destination, string Key) {
+        public static double getDistance(string origin, string destination, string Key) {
             System.Threading.Thread.Sleep(1);
             string distance = "";
             string status = "";
@@ -140,13 +140,13 @@ namespace GoogleDistCalc
                 if (status == "OK") {
                     //Console.WriteLine("DEBUG: Status OK");
                     distance = Nodes[0].ChildNodes[2].ChildNodes[0].InnerText.ToString();
-                    return int.Parse(distance);
+                    return double.Parse(distance);
                 } else {
                     //Console.WriteLine("DEBUG: Status Not OK");
                     return -1;
                 }
             } else {
-                return 0;
+                return -2;
             }
 
         }
