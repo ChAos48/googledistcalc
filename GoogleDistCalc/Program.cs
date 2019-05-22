@@ -11,7 +11,7 @@ namespace GoogleDistCalc
     class Program
     {
         /// <summary>
-        /// args[0] is input filename
+        /// args[0] is API Key
         /// </summary>
         /// <param name="args"></param>
         static void Main(string[] args) {
