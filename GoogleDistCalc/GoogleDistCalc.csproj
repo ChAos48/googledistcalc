@@ -60,6 +60,6 @@
   <ItemGroup>
     <Folder Include="bin\Debug\" />
   </ItemGroup>
-  <Import Project="..\..\Hounding\Hounds\Hounds.projitems" Label="Shared" />
+  <Import Project="..\..\googledistcalc\Hounds\Hounds.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
